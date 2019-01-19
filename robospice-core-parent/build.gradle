@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
-
+apply plugin: 'com.jfrog.artifactory'
+apply plugin: 'maven-publish'
 android {
     compileSdkVersion 28
 
@@ -28,4 +29,37 @@ dependencies {
     implementation 'commons-io:commons-io:2.6'
     implementation 'org.apache.commons:commons-lang3:3.8.1'
     implementation project(':robospice-cache-parent')
+}
+
+
+def libraryGroupId = 'fabric.bits.api'
+def libraryArtifactId = 'robospice'
+def libraryVersion = '0.0.1'
+
+publishing {
+    publications {
+        aar(MavenPublication) {
+            groupId libraryGroupId
+            version libraryVersion
+            artifactId libraryArtifactId
+            artifact("$buildDir/outputs/aar/${project.name+"-release.aar"}")
+        }
+    }
+}
+
+artifactory {
+    contextUrl = bits_artifactory_url
+    publish {
+        repository {
+            repoKey = 'fabric'
+            username = bits_artifactory_username
+            password = bits_artifactory_password
+        }
+        defaults {
+            publications('aar')
+            publishArtifacts = true
+            properties = ['qa.level': 'basic', 'q.os': 'android', 'dev.team': 'core']
+            publishPom = true
+        }
+    }
 }
