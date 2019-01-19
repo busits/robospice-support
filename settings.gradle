@@ -1,0 +1,1 @@
+include ':app', ':robospice-cache-parent', ':robospice-core-parent'
